@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
+import java.util.Map;
 
 public class TesteIntegracao {
 
@@ -25,10 +26,10 @@ public class TesteIntegracao {
         sistema.addRota(rota);
         sistema.addViagem(motorista, veiculo, rota);
 
-        List<String> motoristas = sistema.listarMotoristas();
-        List<String> veiculos = sistema.listarVeiculos();
-        List<String> rotas = sistema.listarRotas();
-        List<String> viagens = sistema.listarViagens();
+        List<Map<String, Object>> motoristas = sistema.listarMotoristas();
+        List<Map<String, Object>> veiculos = sistema.listarVeiculos();
+        List<Map<String, Object>> rotas = sistema.listarRotas();
+        List<Map<String, Object>> viagens = sistema.listarViagens();
 
         assertAll("Verificação do fluxo completo",
                 () -> assertTrue(motoristas.contains(motorista), "Motorista deve estar na lista"),
@@ -47,8 +48,8 @@ public class TesteIntegracao {
         sistema.addVeiculo("Veículo Teste A " + timestamp);
         sistema.addVeiculo("Veículo Teste B " + timestamp);
 
-        List<String> motoristas = sistema.listarMotoristas();
-        List<String> veiculos = sistema.listarVeiculos();
+        List<Map<String, Object>> motoristas = sistema.listarMotoristas();
+        List<Map<String, Object>> veiculos = sistema.listarVeiculos();
 
         assertTrue(motoristas.size() >= 2, "Deve ter pelo menos 2 motoristas");
         assertTrue(veiculos.size() >= 2, "Deve ter pelo menos 2 veículos");

@@ -15,7 +15,7 @@ public class Servidor {
 
         before((req, res) -> {
             res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+            res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
             res.header("Access-Control-Allow-Headers", "Content-Type");
         });
 
@@ -30,6 +30,13 @@ public class Servidor {
             return gson.toJson("Motorista adicionado!");
         });
 
+        delete("/motoristas/:id", (req, res) -> {
+            int id = Integer.parseInt(req.params(":id"));
+            sistema.removerMotorista(id);
+            res.type("application/json");
+            return gson.toJson("Motorista removido!");
+        });
+
         get("/veiculos", (req, res) -> {
             res.type("application/json");
             return gson.toJson(sistema.listarVeiculos());
@@ -41,6 +48,13 @@ public class Servidor {
             return gson.toJson("Veículo adicionado!");
         });
 
+        delete("/veiculos/:id", (req, res) -> {
+            int id = Integer.parseInt(req.params(":id"));
+            sistema.removerVeiculo(id);
+            res.type("application/json");
+            return gson.toJson("Veículo removido!");
+        });
+
         get("/rotas", (req, res) -> {
             res.type("application/json");
             return gson.toJson(sistema.listarRotas());
@@ -50,6 +64,13 @@ public class Servidor {
             sistema.addRota(req.queryParams("descricao"));
             res.type("application/json");
             return gson.toJson("Rota adicionada!");
+        });
+
+        delete("/rotas/:id", (req, res) -> {
+            int id = Integer.parseInt(req.params(":id"));
+            sistema.removerRota(id);
+            res.type("application/json");
+            return gson.toJson("Rota removida!");
         });
 
         get("/viagens", (req, res) -> {
@@ -64,6 +85,13 @@ public class Servidor {
             sistema.addViagem(motorista, veiculo, rota);
             res.type("application/json");
             return gson.toJson("Viagem registrada!");
+        });
+
+        delete("/viagens/:id", (req, res) -> {
+            int id = Integer.parseInt(req.params(":id"));
+            sistema.removerViagem(id);
+            res.type("application/json");
+            return gson.toJson("Viagem removida!");
         });
 
         options("/*", (req, res) -> {

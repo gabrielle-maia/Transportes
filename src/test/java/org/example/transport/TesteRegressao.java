@@ -3,6 +3,7 @@ package org.example.transport;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
+import java.util.Map;
 
 public class TesteRegressao {
     @Test
@@ -13,10 +14,10 @@ public class TesteRegressao {
         sistema.addRota("Teste Regressão Rota");
         sistema.addViagem("Teste Regressão Motorista", "Teste Regressão Veículo", "Teste Regressão Rota");
 
-        List<String> motoristas = sistema.listarMotoristas();
-        List<String> veiculos = sistema.listarVeiculos();
-        List<String> rotas = sistema.listarRotas();
-        List<String> viagens = sistema.listarViagens();
+        List<Map<String, Object>> motoristas = sistema.listarMotoristas();
+        List<Map<String, Object>> veiculos = sistema.listarVeiculos();
+        List<Map<String, Object>> rotas = sistema.listarRotas();
+        List<Map<String, Object>> viagens = sistema.listarViagens();
 
         assertAll("Teste de Regressão - Funcionalidades Principais",
                 () -> assertFalse(motoristas.isEmpty(), "Cadastro de motoristas deve funcionar"),
@@ -36,7 +37,7 @@ public class TesteRegressao {
         sistema.addMotorista("Motorista Único");
         sistema.addMotorista("Motorista Único");
         sistema.addMotorista("Motorista Único");
-        List<String> motoristas = sistema.listarMotoristas();
+        List<Map<String, Object>> motoristas = sistema.listarMotoristas();
         assertTrue(motoristas.contains("Motorista Único"), "Motorista deve estar presente");
     }
 }

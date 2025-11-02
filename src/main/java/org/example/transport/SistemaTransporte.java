@@ -35,24 +35,39 @@ public class SistemaTransporte {
         executarInsert("INSERT INTO motoristas(nome) VALUES(?)", nome);
     }
 
-    public List<String> listarMotoristas() {
-        return listar("SELECT nome FROM motoristas");
+    public List<Map<String, Object>> listarMotoristas() {
+        return listarComId("SELECT id, nome FROM motoristas");
+    }
+
+    public void removerMotorista(int id) {
+        executarDelete("DELETE FROM motoristas WHERE id = ?", id);
+        resetarAutoIncrementoSeVazio("motoristas");
     }
 
     public void addVeiculo(String modelo) {
         executarInsert("INSERT INTO veiculos(modelo) VALUES(?)", modelo);
     }
 
-    public List<String> listarVeiculos() {
-        return listar("SELECT modelo FROM veiculos");
+    public List<Map<String, Object>> listarVeiculos() {
+        return listarComId("SELECT id, modelo FROM veiculos");
+    }
+
+    public void removerVeiculo(int id) {
+        executarDelete("DELETE FROM veiculos WHERE id = ?", id);
+        resetarAutoIncrementoSeVazio("veiculos");
     }
 
     public void addRota(String descricao) {
         executarInsert("INSERT INTO rotas(descricao) VALUES(?)", descricao);
     }
 
-    public List<String> listarRotas() {
-        return listar("SELECT descricao FROM rotas");
+    public List<Map<String, Object>> listarRotas() {
+        return listarComId("SELECT id, descricao FROM rotas");
+    }
+
+    public void removerRota(int id) {
+        executarDelete("DELETE FROM rotas WHERE id = ?", id);
+        resetarAutoIncrementoSeVazio("rotas");
     }
 
     public void addViagem(String motorista, String veiculo, String rota) {
@@ -67,19 +82,27 @@ public class SistemaTransporte {
         }
     }
 
-    public List<String> listarViagens() {
-        List<String> lista = new ArrayList<>();
+    public List<Map<String, Object>> listarViagens() {
+        List<Map<String, Object>> lista = new ArrayList<>();
         try (Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery("SELECT motorista, veiculo, rota FROM viagens")) {
+             ResultSet rs = st.executeQuery("SELECT id, motorista, veiculo, rota FROM viagens")) {
             while (rs.next()) {
-                lista.add(rs.getString("motorista") + " - " +
-                        rs.getString("veiculo") + " - " +
-                        rs.getString("rota"));
+                Map<String, Object> viagem = new HashMap<>();
+                viagem.put("id", rs.getInt("id"));
+                viagem.put("motorista", rs.getString("motorista"));
+                viagem.put("veiculo", rs.getString("veiculo"));
+                viagem.put("rota", rs.getString("rota"));
+                lista.add(viagem);
             }
         } catch (SQLException e) {
             System.out.println("Erro ao listar viagens: " + e.getMessage());
         }
         return lista;
+    }
+
+    public void removerViagem(int id) {
+        executarDelete("DELETE FROM viagens WHERE id = ?", id);
+        resetarAutoIncrementoSeVazio("viagens");
     }
 
     private void executarInsert(String sql, String valor) {
@@ -91,16 +114,41 @@ public class SistemaTransporte {
         }
     }
 
-    private List<String> listar(String sql) {
-        List<String> lista = new ArrayList<>();
+    private void executarDelete(String sql, int id) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Erro ao excluir: " + e.getMessage());
+        }
+    }
+
+    private List<Map<String, Object>> listarComId(String sql) {
+        List<Map<String, Object>> lista = new ArrayList<>();
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) lista.add(rs.getString(1));
+            ResultSetMetaData meta = rs.getMetaData();
+            while (rs.next()) {
+                Map<String, Object> item = new HashMap<>();
+                for (int i = 1; i <= meta.getColumnCount(); i++) {
+                    item.put(meta.getColumnName(i), rs.getObject(i));
+                }
+                lista.add(item);
+            }
         } catch (SQLException e) {
             System.out.println("Erro ao listar: " + e.getMessage());
         }
         return lista;
     }
+
+    private void resetarAutoIncrementoSeVazio(String tabela) {
+        try (Statement st = conn.createStatement()) {
+            ResultSet rs = st.executeQuery("SELECT COUNT(*) AS total FROM " + tabela);
+            if (rs.next() && rs.getInt("total") == 0) {
+                st.execute("DELETE FROM sqlite_sequence WHERE name='" + tabela + "'");
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao resetar autoincremento: " + e.getMessage());
+        }
+    }
 }
-
-
