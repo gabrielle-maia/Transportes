@@ -1,5 +1,6 @@
 package org.example.transport;
 
+import java.io.File;
 import java.sql.*;
 import java.util.*;
 
@@ -7,14 +8,18 @@ public class SistemaTransporte {
     private Connection conn;
 
     public SistemaTransporte() {
-        conectar();
+        this("transport.db");
+    }
+
+    public SistemaTransporte(String nomeBanco) {
+        conectar(nomeBanco);
         criarTabelas();
     }
 
-    private void conectar() {
+    private void conectar(String nomeBanco) {
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:transport.db");
-            System.out.println("Conectado ao banco de dados SQLite.");
+            conn = DriverManager.getConnection("jdbc:sqlite:" + nomeBanco);
+            System.out.println("Conectado ao banco de dados SQLite (" + nomeBanco + ").");
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao conectar ao banco: " + e.getMessage());
         }
@@ -150,5 +155,10 @@ public class SistemaTransporte {
         } catch (SQLException e) {
             System.out.println("Erro ao resetar autoincremento: " + e.getMessage());
         }
+    }
+
+    public static void limparBancoTeste() {
+        File db = new File("transport_test.db");
+        if (db.exists()) db.delete();
     }
 }

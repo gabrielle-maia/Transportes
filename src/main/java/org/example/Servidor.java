@@ -6,6 +6,11 @@ import com.google.gson.Gson;
 
 public class Servidor {
     public static void main(String[] args) {
+        if (isRunningUnderJUnit()) {
+            System.out.println("[Servidor] Ignorado: execução de testes detectada.");
+            return;
+        }
+
         port(8080);
         SistemaTransporte sistema = new SistemaTransporte();
         Gson gson = new Gson();
@@ -98,5 +103,15 @@ public class Servidor {
             res.type("application/json");
             return gson.toJson("OK");
         });
+    }
+
+    private static boolean isRunningUnderJUnit() {
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            if (element.getClassName().startsWith("org.junit.") ||
+                    element.getClassName().startsWith("org.eclipse.jdt.internal.junit.")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
